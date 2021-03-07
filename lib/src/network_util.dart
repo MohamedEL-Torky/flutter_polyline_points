@@ -42,20 +42,18 @@ class NetworkUtil {
       }
       params.addAll({"waypoints": wayPointsString});
     }
-    Uri uri =
-        Uri.https("maps.googleapis.com", "maps/api/directions/json", params);
+    Uri uri = Uri.https("maps.googleapis.com", "maps/api/directions/json", params);
 
     String url = uri.toString();
     // print('GOOGLE MAPS URL: ' + url);
-    var response = await http.get(url);
+    var response = await http.get(Uri.tryParse(url));
     if (response?.statusCode == 200) {
       var parsedJson = json.decode(response.body);
       result.status = parsedJson["status"];
       if (parsedJson["status"]?.toLowerCase() == STATUS_OK &&
           parsedJson["routes"] != null &&
           parsedJson["routes"].isNotEmpty) {
-        result.points = decodeEncodedPolyline(
-            parsedJson["routes"][0]["overview_polyline"]["points"]);
+        result.points = decodeEncodedPolyline(parsedJson["routes"][0]["overview_polyline"]["points"]);
       } else {
         result.errorMessage = parsedJson["error_message"];
       }
@@ -91,8 +89,7 @@ class NetworkUtil {
       } while (b >= 0x20);
       int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lng += dlng;
-      PointLatLng p =
-          new PointLatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+      PointLatLng p = new PointLatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
       poly.add(p);
     }
     return poly;
